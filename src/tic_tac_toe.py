@@ -9,9 +9,11 @@ class TicTacToe:
 
     def play(self, row: int, col: int) -> None:
         if row > 2 or col > 2:
-            raise ValueError("error: play index out of bounds")
-        self._board[row][col] = self._turn
+            raise IndexError("error: play index out of bounds")
+        if self._board[row][col] != self.EMPTY:
+            raise ValueError(f"error: the cell {row} {col} is not empty")
 
+        self._board[row][col] = self._turn
         if self._turn == self.X:
             self._turn = self.O
         else:
@@ -24,6 +26,7 @@ class TicTacToe:
                 row[0]
                 == row[1]
                 == row[2]
+                != self.EMPTY
             ):
                 return row[0]
 
@@ -33,6 +36,7 @@ class TicTacToe:
                 self._board[0][i]
                 == self._board[1][i]
                 == self._board[2][i]
+                != self.EMPTY
             ):
                 return self._board[0][i]
 
@@ -41,6 +45,7 @@ class TicTacToe:
             self._board[0][0]
             == self._board[1][1]
             == self._board[2][2]
+            != self.EMPTY
         ):
             return self._board[1][1]
 
@@ -48,6 +53,7 @@ class TicTacToe:
             self._board[0][2]
             == self._board[1][1]
             == self._board[2][0]
+            != self.EMPTY
         ):
             return self._board[1][1]
 
@@ -57,7 +63,7 @@ class TicTacToe:
     def is_board_complete(self) -> bool:
         for row in self._board:
             for cell in row:
-                if cell != self.EMPTY:
+                if cell == self.EMPTY:
                     return False
         return True
 
