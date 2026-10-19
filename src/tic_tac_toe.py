@@ -1,6 +1,6 @@
 class TicTacToe:
     X = 1
-    O = -1
+    O = 2
     EMPTY = 0
 
     def __init__(self):
@@ -12,7 +12,7 @@ class TicTacToe:
         if row > 2 or col > 2:
             raise IndexError("error: play index out of bounds")
         if self._winner:
-            return
+            raise RuntimeError(f"error: player {self._winner} has already won")
         if self._board[row][col] != self.EMPTY:
             raise ValueError(f"error: the cell {row} {col} is not empty")
 
