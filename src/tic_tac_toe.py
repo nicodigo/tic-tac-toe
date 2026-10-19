@@ -6,14 +6,18 @@ class TicTacToe:
     def __init__(self):
         self._board: list[list[int]] = [[self.EMPTY] * 3 for _ in range(3)]
         self._turn: int = self.X
+        self._winner = None
 
     def play(self, row: int, col: int) -> None:
         if row > 2 or col > 2:
             raise IndexError("error: play index out of bounds")
+        if self._winner:
+            return
         if self._board[row][col] != self.EMPTY:
             raise ValueError(f"error: the cell {row} {col} is not empty")
 
         self._board[row][col] = self._turn
+        self._winner = self.check_winner()
         if self._turn == self.X:
             self._turn = self.O
         else:
