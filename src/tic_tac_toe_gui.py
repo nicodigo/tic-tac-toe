@@ -5,30 +5,30 @@ from tic_tac_toe import TicTacToe
 
 
 class TicTacToeGUI:
-    def __init__(self, root: Tk, game_board: TicTacToe) -> None:
-        self._game_board = game_board
-        self._game_board.__init__()
+    def __init__(self, root: Tk, game_state: TicTacToe) -> None:
+        self._game_state = game_state
+        self._game_state.__init__()
         root.title("Tic-Tac-Toe")
         root.grid_columnconfigure(0, weight=1)
         root.grid_rowconfigure(0, weight=1)
-        self._mainframe = Frame(root)
-        self._mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-        self._mainframe.grid_columnconfigure(0, weight=3)
-        self._mainframe.grid_rowconfigure(0, weight=16)
-        self._mainframe.grid_rowconfigure(1, weight=1)
+        mainframe = Frame(root)
+        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        mainframe.grid_columnconfigure(0, weight=3)
+        mainframe.grid_rowconfigure(0, weight=16)
+        mainframe.grid_rowconfigure(1, weight=1)
 
-        self._board = Frame(self._mainframe)
-        self._board.configure(bg="#222233")
-        self._board.grid(column=0, row=0, sticky=(N, W, E, S))
-        self._board.grid_columnconfigure([0, 1, 2], weight=1)
-        self._board.grid_rowconfigure([0, 1, 2], weight=1)
+        board = Frame(mainframe)
+        board.configure(bg="#222233")
+        board.grid(column=0, row=0, sticky=(N, W, E, S))
+        board.grid_columnconfigure([0, 1, 2], weight=1)
+        board.grid_rowconfigure([0, 1, 2], weight=1)
 
         self._tiles: list[BoardTileGUI] = []
         padx = 5
         pady = 5
         for i in range(3):
             for j in range(3):
-                new_tile = BoardTileGUI(i, j, 128, self._board)
+                new_tile = BoardTileGUI(i, j, 128, board)
                 new_tile.grid(row=i, column=j, sticky=(N, W, E, S))
                 new_tile.configure(bg="white")
 
@@ -52,26 +52,26 @@ class TicTacToeGUI:
                     "<Button-1>", lambda e, tile=new_tile: self._tile_clicked(tile)
                 )
 
-        self._lower_section = Frame(self._mainframe)
-        self._lower_section.grid_columnconfigure(0, weight=1)
-        self._lower_section.grid_columnconfigure(1, weight=1)
-        self._lower_section.grid_rowconfigure(0, weight=1)
-        self._lower_section.grid(row=1, column=0, sticky=(N, W, E, S))
-        self._lower_section.configure(bg="#536878")
-        reset_btn = Button(self._lower_section)
+        lower_section = Frame(mainframe)
+        lower_section.grid_columnconfigure(0, weight=1)
+        lower_section.grid_columnconfigure(1, weight=1)
+        lower_section.grid_rowconfigure(0, weight=1)
+        lower_section.grid(row=1, column=0, sticky=(N, W, E, S))
+        lower_section.configure(bg="#536878")
+        reset_btn = Button(lower_section)
         reset_btn.configure(
-            command=lambda r=root, g=self._game_board: self.__init__(r, g),
+            command=lambda r=root, g=self._game_state: self.__init__(r, g),
             text="Reset Game Board",
         )
         reset_btn.grid(column=0, row=1, padx=20, pady=20, sticky=W)
         self._style_button(reset_btn)
-        exit_btn = Button(self._lower_section)
+        exit_btn = Button(lower_section)
         exit_btn.configure(command=root.destroy, text="EXIT")
         exit_btn.grid(column=1, row=1, padx=20, pady=20, sticky=E)
         self._style_button(exit_btn)
 
         self._winner_value = StringVar(value="")
-        winner_banner = Label(self._lower_section, textvariable=self._winner_value)
+        winner_banner = Label(lower_section, textvariable=self._winner_value)
         winner_banner.grid(column=0, row=0, columnspan=2, sticky=(N, E, S, W))
         winner_banner.configure(font=("Arial", 48), bg="#536878")
 
@@ -92,11 +92,13 @@ class TicTacToeGUI:
 
     def _play(self, row: int, col: int) -> None:
         try:
-            self._game_board.play(row, col)
+            self._game_state = self._game_state.play(row, col)
             self._draw_board()
-            winner = self._game_board.check_winner()
+            winner = self._game_state.check_winner()
             if winner:
                 self._handle_winner(winner)
+            elif self._game_state.is_tie():
+                self._handle_tie()
             print("succesful play")
         except ValueError as e:
             print(f"ValueError: {e}")
@@ -105,7 +107,7 @@ class TicTacToeGUI:
 
     def _draw_board(self) -> None:
         i = 0
-        for row in self._game_board.get_board():
+        for row in self._game_state.get_board():
             for cell in row:
                 tile = self._tiles[i]
                 if cell == TicTacToe.X:
@@ -118,6 +120,9 @@ class TicTacToeGUI:
 
     def _handle_winner(self, winner: int) -> None:
         if winner == TicTacToe.X:
-            self._winner_value.set("Player (X) has Won!")
+            self._winner_value.set('Player "X" Has Won!')
         elif winner == TicTacToe.O:
-            self._winner_value.set("Player (O) has Won!")
+            self._winner_value.set('Player "O" Has Won!')
+
+    def _handle_tie(self) -> None:
+            self._winner_value.set("The Game Ends In a Tie!")
