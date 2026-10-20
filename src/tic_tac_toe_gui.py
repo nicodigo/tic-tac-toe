@@ -1,6 +1,7 @@
 from tkinter import Button, E, Frame, Label, N, S, StringVar, Tk, W
 
 from board_tile_gui import BoardTileGUI
+from tic_tac_bot import TicTacBot
 from tic_tac_toe import TicTacToe
 
 
@@ -8,6 +9,8 @@ class TicTacToeGUI:
     def __init__(self, root: Tk, game_state: TicTacToe) -> None:
         self._game_state = game_state
         self._game_state.__init__()
+        self._player = TicTacToe.X
+        self._bot = TicTacBot(game_state, TicTacToe.O)
         root.title("Tic-Tac-Toe")
         root.grid_columnconfigure(0, weight=1)
         root.grid_rowconfigure(0, weight=1)
@@ -91,19 +94,46 @@ class TicTacToeGUI:
         self._play(row, col)
 
     def _play(self, row: int, col: int) -> None:
+        if self._game_state.get_current_turn() != self._player:
+            return
         try:
             self._game_state = self._game_state.play(row, col)
+            print("succesful play")
+            self._bot.record_move(self._game_state)
             self._draw_board()
             winner = self._game_state.check_winner()
             if winner:
                 self._handle_winner(winner)
             elif self._game_state.is_tie():
                 self._handle_tie()
-            print("succesful play")
+            else:
+                self._bot_play()
         except ValueError as e:
             print(f"ValueError: {e}")
         except RuntimeError as e:
             print(f"RuntimeError {e}")
+
+    def _bot_play(self):
+        print(f"bot play turn: {self._game_state.get_current_turn()}")
+        try:
+            move = self._bot.make_move()
+            if move is None:
+                raise RuntimeError("error: bot not working")
+            row, col = move
+            self._game_state = self._game_state.play(row, col)
+            self._bot.record_move(self._game_state)
+            self._draw_board()
+            winner = self._game_state.check_winner()
+            if winner:
+                self._handle_winner(winner)
+            elif self._game_state.is_tie():
+                self._handle_tie()
+            print("succesful bot play")
+        except ValueError as e:
+            print(f"ValueError: {e}")
+        except RuntimeError as e:
+            print(f"RuntimeError {e}")
+
 
     def _draw_board(self) -> None:
         i = 0

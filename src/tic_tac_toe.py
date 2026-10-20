@@ -9,6 +9,7 @@ class TicTacToe:
         else:
             self._board = board
         self._turn: int = turn
+        self._winner = None
         self._winner = self.check_winner()
 
     def play(self, row: int, col: int) -> 'TicTacToe':
@@ -28,6 +29,8 @@ class TicTacToe:
         return TicTacToe(new_board, turn)
 
     def check_winner(self) -> int | None:
+        if self._winner:
+            return self._winner
         # check rows
         for row in self._board:
             if (
@@ -82,6 +85,8 @@ class TicTacToe:
         return self._is_board_complete() and (self._winner == None)
 
     def get_legal_moves(self) -> list[tuple[int, int]]:
+        if self._winner:
+            return []
         legal_moves: list[tuple[int,int]] = []
         for r in range(3):
             for c in range(3):
@@ -105,5 +110,12 @@ class TicTacToe:
                 if self._board[r][c] != other_board[r][c]:
                     return False
 
+        return True
+
+    def is_first_move(self):
+        for row in self._board:
+            for cell in row:
+                if cell != self.EMPTY:
+                    return False
         return True
 
