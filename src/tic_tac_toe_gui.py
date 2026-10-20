@@ -32,7 +32,7 @@ class TicTacToeGUI:
         pady = 5
         for i in range(3):
             for j in range(3):
-                new_tile = BoardTileGUI(i, j, 128, board)
+                new_tile = BoardTileGUI(i, j, 96, board)
                 new_tile.grid(row=i, column=j, sticky=(N, W, E, S))
                 new_tile.configure(bg="white")
 
@@ -77,7 +77,7 @@ class TicTacToeGUI:
         self._info_value = StringVar(value="")
         info_banner = Label(lower_section, textvariable=self._info_value)
         info_banner.grid(column=0, row=0, columnspan=2, sticky=(N, E, S, W))
-        info_banner.configure(font=("Arial", 48), bg="#536878")
+        info_banner.configure(font=("Arial", 32), bg="#536878")
 
     def _reset_game(self) -> None:
         self._controller.reset_game()
