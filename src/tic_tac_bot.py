@@ -28,11 +28,13 @@ class TicTacBot:
     def make_move(self) -> tuple[int, int]:
         if self._root.game_state.get_current_turn() != self._symbol:
             raise RuntimeError("error: not my turn")
+
         if self._root.next_states == None:
             raise RuntimeError("error: there is not possible moves")
+
         if self._root.game_state.is_first_move():
             return (1, 1)
-        self._calculate_minmax(self._root)
+
         max_node = None
         min_value = -10
         for node in self._root.next_states:
