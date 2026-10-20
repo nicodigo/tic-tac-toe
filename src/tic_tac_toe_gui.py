@@ -6,11 +6,11 @@ from tic_tac_toe import TicTacToe
 
 
 class TicTacToeGUI:
-    def __init__(self, root: Tk, game_state: TicTacToe) -> None:
+    def __init__(self, root: Tk, game_state: TicTacToe, one_player_mode: bool = False, bot_player_symbol: int = TicTacToe.O) -> None:
         self._game_state = game_state
-        self._game_state.__init__()
-        self._player = TicTacToe.X
-        self._bot = TicTacBot(game_state, TicTacToe.O)
+        self._bot = TicTacBot(game_state, bot_player_symbol)
+        self._bot_player_symbol = bot_player_symbol
+        self._one_player_mode = one_player_mode
         root.title("Tic-Tac-Toe")
         root.grid_columnconfigure(0, weight=1)
         root.grid_rowconfigure(0, weight=1)
@@ -73,10 +73,18 @@ class TicTacToeGUI:
         exit_btn.grid(column=1, row=1, padx=20, pady=20, sticky=E)
         self._style_button(exit_btn)
 
-        self._winner_value = StringVar(value="")
-        winner_banner = Label(lower_section, textvariable=self._winner_value)
-        winner_banner.grid(column=0, row=0, columnspan=2, sticky=(N, E, S, W))
-        winner_banner.configure(font=("Arial", 48), bg="#536878")
+        self._info_value = StringVar(value="")
+        info_banner = Label(lower_section, textvariable=self._info_value)
+        info_banner.grid(column=0, row=0, columnspan=2, sticky=(N, E, S, W))
+        info_banner.configure(font=("Arial", 48), bg="#536878")
+
+        self._start_game()
+
+    def _start_game(self):
+        if self._one_player_mode and self._bot_player_symbol == TicTacToe.X:
+            row, col = self._bot.make_move()
+            self._game_state.play(row, col)
+            self._bot.record_move(self._game_state)
 
     def _style_button(self, b: Button) -> None:
         b.configure(
@@ -94,7 +102,7 @@ class TicTacToeGUI:
         self._play(row, col)
 
     def _play(self, row: int, col: int) -> None:
-        if self._game_state.get_current_turn() != self._player:
+        if self._one_player_mode and self._game_state.get_current_turn() == self._bot_player_symbol:
             return
         try:
             self._game_state = self._game_state.play(row, col)
@@ -106,7 +114,7 @@ class TicTacToeGUI:
                 self._handle_winner(winner)
             elif self._game_state.is_tie():
                 self._handle_tie()
-            else:
+            elif self._one_player_mode:
                 self._bot_play()
         except ValueError as e:
             print(f"ValueError: {e}")
@@ -116,10 +124,7 @@ class TicTacToeGUI:
     def _bot_play(self):
         print(f"bot play turn: {self._game_state.get_current_turn()}")
         try:
-            move = self._bot.make_move()
-            if move is None:
-                raise RuntimeError("error: bot not working")
-            row, col = move
+            row, col = self._bot.make_move()
             self._game_state = self._game_state.play(row, col)
             self._bot.record_move(self._game_state)
             self._draw_board()
@@ -150,9 +155,9 @@ class TicTacToeGUI:
 
     def _handle_winner(self, winner: int) -> None:
         if winner == TicTacToe.X:
-            self._winner_value.set('Player "X" Has Won!')
+            self._info_value.set('Player "X" Has Won!')
         elif winner == TicTacToe.O:
-            self._winner_value.set('Player "O" Has Won!')
+            self._info_value.set('Player "O" Has Won!')
 
     def _handle_tie(self) -> None:
-            self._winner_value.set("The Game Ends In a Tie!")
+            self._info_value.set("The Game Ends In a Tie!")

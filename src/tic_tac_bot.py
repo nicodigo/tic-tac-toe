@@ -17,7 +17,7 @@ class TicTacBot:
         self._root: GSNode = GSNode(game_state)
         self._root = self._build_tree(self._root)
 
-    def make_move(self) -> tuple[int, int] | None:
+    def make_move(self) -> tuple[int, int]:
         if self._root.game_state.get_current_turn() != self._player:
             raise RuntimeError("error: not my turn")
         if self._root.next_states == None:
@@ -28,7 +28,11 @@ class TicTacBot:
         print(f"after minmax root: {self._root} value: {self._root.value} next_states: {self._root.next_states}")
         for node in self._root.next_states:
             if node.value == self._root.value:
+                if node.move is None:
+                    raise RuntimeError("error: something went wrong making move")
                 return node.move
+
+        raise RuntimeError("error: something went wrong making move")
 
     def _calculate_minmax(self, root: GSNode, minimize=False) -> int:
         if root.next_states == None:
