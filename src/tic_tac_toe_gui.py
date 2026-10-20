@@ -95,7 +95,6 @@ class TicTacToeGUI:
     def _tile_clicked(self, tile: BoardTileGUI) -> None:
         row = tile.get_row()
         col = tile.get_col()
-        print(f"Clicked: row={row} col={col}")
         self._controller.play(row, col)
 
     def handle_controller_change(self) -> None:

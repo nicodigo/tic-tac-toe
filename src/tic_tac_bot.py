@@ -15,20 +15,15 @@ class GSNode:
 
 
 class TicTacBot:
-    def __init__(self, game_state: TicTacToe, playing: int) -> None:
-        self._symbol = playing
+    def __init__(self, game_state: TicTacToe) -> None:
         self._tree_root: GSNode = GSNode(game_state)
         self._tree_root = self._build_tree(self._tree_root)
         self._root = self._tree_root
 
     def reset(self):
         self._root = self._tree_root
-        self._calculate_minmax(self._root)
 
     def make_move(self) -> tuple[int, int]:
-        if self._root.game_state.get_current_turn() != self._symbol:
-            raise RuntimeError("error: not my turn")
-
         if self._root.next_states == None:
             raise RuntimeError("error: there is not possible moves")
 
@@ -38,7 +33,7 @@ class TicTacBot:
         max_node = None
         min_value = -10
         for node in self._root.next_states:
-            value = self._calculate_minmax(node, True)
+            value = self._calculate_minmax(node, self._root.game_state.get_current_turn(), True)
             if value > min_value:
                 max_node = node
                 min_value = value
@@ -48,9 +43,9 @@ class TicTacBot:
 
         raise RuntimeError("error: something went wrong making move")
 
-    def _calculate_minmax(self, root: GSNode, minimize=True) -> int:
+    def _calculate_minmax(self, root: GSNode, symbol: int, minimize=True) -> int:
         if root.next_states == None:
-            if root.game_state.check_winner() == self._symbol:
+            if root.game_state.check_winner() == symbol:
                 return 1
             elif root.game_state.is_tie():
                 return 0
@@ -59,12 +54,12 @@ class TicTacBot:
         if minimize:
             value = 10
             for node in root.next_states:
-                value = min(value, self._calculate_minmax(node, False))
+                value = min(value, self._calculate_minmax(node, symbol, False))
             return value
         else:
             value = -10
             for node in root.next_states:
-                value = max(value, self._calculate_minmax(node, True))
+                value = max(value, self._calculate_minmax(node, symbol, True))
             return value
 
     def record_move(self, game_state: TicTacToe) -> None:

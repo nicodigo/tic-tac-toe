@@ -10,7 +10,7 @@ class Controller:
     ) -> None:
         self._original_game_state = game_state
         self._game_state = game_state
-        self._bot = TicTacBot(game_state, bot_player_symbol)
+        self._bot = TicTacBot(game_state)
         self._bot_player_symbol = bot_player_symbol
         self._one_player_mode = one_player_mode
         self._gs_change_callback = None
