@@ -37,7 +37,10 @@ class Controller:
             return
         try:
             self._register_move(row, col)
-            if self._one_player_mode:
+            if (self._one_player_mode
+                and not self._game_state.check_winner()
+                and not self._game_state.is_tie()
+                    ):
                 self._bot_play()
         except ValueError as e:
             print(f"ValueError: {e}")
