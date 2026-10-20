@@ -69,19 +69,31 @@ class TicTacToeGUI:
         )
         reset_btn.grid(column=0, row=1, padx=20, pady=20, sticky=W)
         self._style_button(reset_btn)
+
+        help_btn = Button(lower_section)
+        help_btn.configure(
+            command=self._ask_for_move,
+            text="Make Move",
+        )
+        help_btn.grid(column=1, row=1, padx=20, pady=20, sticky=W)
+        self._style_button(help_btn)
+
         exit_btn = Button(lower_section)
         exit_btn.configure(command=root.destroy, text="EXIT")
-        exit_btn.grid(column=1, row=1, padx=20, pady=20, sticky=E)
+        exit_btn.grid(column=2, row=1, padx=20, pady=20, sticky=E)
         self._style_button(exit_btn)
 
         self._info_value = StringVar(value="")
         info_banner = Label(lower_section, textvariable=self._info_value)
-        info_banner.grid(column=0, row=0, columnspan=2, sticky=(N, E, S, W))
+        info_banner.grid(column=0, row=0, columnspan=3, sticky=(N, E, S, W))
         info_banner.configure(font=("Arial", 32), bg="#536878")
 
     def _reset_game(self) -> None:
         self._controller.reset_game()
         self._info_value.set("")
+
+    def _ask_for_move(self) -> None:
+        self._controller.request_bot_move()
 
     def _style_button(self, b: Button) -> None:
         b.configure(

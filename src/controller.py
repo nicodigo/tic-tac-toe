@@ -74,3 +74,6 @@ class Controller:
         self._bot.reset()
         self._start_game()
         self._handle_game_state_change()
+
+    def request_bot_move(self) -> None:
+        self._bot_play()
