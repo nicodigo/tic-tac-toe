@@ -1,5 +1,6 @@
 from tkinter import Tk
 
+from controller import Controller
 from tic_tac_toe import TicTacToe
 from tic_tac_toe_gui import TicTacToeGUI
 
@@ -33,14 +34,22 @@ def get_bot_symbol() -> int:
 
 def main() -> None:
     one_player_mode: bool = is_one_player_mode()
-    root = Tk()
     game = TicTacToe()
     if one_player_mode:
-        print("one player mode selected")
+        print("One Player Mode Selected")
         bot_symbol = get_bot_symbol()
-        game_wind = TicTacToeGUI(root, game, one_player_mode, bot_symbol)
+        print("Bot symbol selected correctly")
+        print("Initializing the game, it will take a few seconds...")
+        ctrl: Controller = Controller(game, True, bot_symbol)
+        print("I hope you have fun!!")
     else:
-        game_wind = TicTacToeGUI(root, game)
+        print("Two Player Mode Selected")
+        print("Initializing the game, it will take a few seconds...")
+        ctrl: Controller = Controller(game, False)
+        print("I hope you have fun!!")
+    root = Tk()
+    game_wind = TicTacToeGUI(root, ctrl)
+    ctrl.set_game_state_change_callback(game_wind.handle_controller_change)
     root.mainloop()
 
 

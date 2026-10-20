@@ -1,16 +1,17 @@
 from tkinter import Button, E, Frame, Label, N, S, StringVar, Tk, W
 
 from board_tile_gui import BoardTileGUI
-from tic_tac_bot import TicTacBot
+from controller import Controller
 from tic_tac_toe import TicTacToe
 
 
 class TicTacToeGUI:
-    def __init__(self, root: Tk, game_state: TicTacToe, one_player_mode: bool = False, bot_player_symbol: int = TicTacToe.O) -> None:
-        self._game_state = game_state
-        self._bot = TicTacBot(game_state, bot_player_symbol)
-        self._bot_player_symbol = bot_player_symbol
-        self._one_player_mode = one_player_mode
+    def __init__(
+        self,
+        root: Tk,
+        controller: Controller
+    ) -> None:
+        self._controller = controller
         root.title("Tic-Tac-Toe")
         root.grid_columnconfigure(0, weight=1)
         root.grid_rowconfigure(0, weight=1)
@@ -63,7 +64,7 @@ class TicTacToeGUI:
         lower_section.configure(bg="#536878")
         reset_btn = Button(lower_section)
         reset_btn.configure(
-            command=lambda r=root, g=self._game_state: self.__init__(r, g),
+            command=self._reset_game,
             text="Reset Game Board",
         )
         reset_btn.grid(column=0, row=1, padx=20, pady=20, sticky=W)
@@ -78,13 +79,9 @@ class TicTacToeGUI:
         info_banner.grid(column=0, row=0, columnspan=2, sticky=(N, E, S, W))
         info_banner.configure(font=("Arial", 48), bg="#536878")
 
-        self._start_game()
-
-    def _start_game(self):
-        if self._one_player_mode and self._bot_player_symbol == TicTacToe.X:
-            row, col = self._bot.make_move()
-            self._game_state.play(row, col)
-            self._bot.record_move(self._game_state)
+    def _reset_game(self) -> None:
+        self._controller.reset_game()
+        self._info_value.set("")
 
     def _style_button(self, b: Button) -> None:
         b.configure(
@@ -99,50 +96,19 @@ class TicTacToeGUI:
         row = tile.get_row()
         col = tile.get_col()
         print(f"Clicked: row={row} col={col}")
-        self._play(row, col)
+        self._controller.play(row, col)
 
-    def _play(self, row: int, col: int) -> None:
-        if self._one_player_mode and self._game_state.get_current_turn() == self._bot_player_symbol:
-            return
-        try:
-            self._game_state = self._game_state.play(row, col)
-            print("succesful play")
-            self._bot.record_move(self._game_state)
-            self._draw_board()
-            winner = self._game_state.check_winner()
-            if winner:
-                self._handle_winner(winner)
-            elif self._game_state.is_tie():
-                self._handle_tie()
-            elif self._one_player_mode:
-                self._bot_play()
-        except ValueError as e:
-            print(f"ValueError: {e}")
-        except RuntimeError as e:
-            print(f"RuntimeError {e}")
-
-    def _bot_play(self):
-        print(f"bot play turn: {self._game_state.get_current_turn()}")
-        try:
-            row, col = self._bot.make_move()
-            self._game_state = self._game_state.play(row, col)
-            self._bot.record_move(self._game_state)
-            self._draw_board()
-            winner = self._game_state.check_winner()
-            if winner:
-                self._handle_winner(winner)
-            elif self._game_state.is_tie():
-                self._handle_tie()
-            print("succesful bot play")
-        except ValueError as e:
-            print(f"ValueError: {e}")
-        except RuntimeError as e:
-            print(f"RuntimeError {e}")
-
+    def handle_controller_change(self) -> None:
+        self._draw_board()
+        winner = self._controller.check_winner()
+        if winner:
+            self._handle_winner(winner)
+        elif self._controller.is_tie():
+            self._handle_tie()
 
     def _draw_board(self) -> None:
         i = 0
-        for row in self._game_state.get_board():
+        for row in self._controller.get_game_board():
             for cell in row:
                 tile = self._tiles[i]
                 if cell == TicTacToe.X:
@@ -160,4 +126,4 @@ class TicTacToeGUI:
             self._info_value.set('Player "O" Has Won!')
 
     def _handle_tie(self) -> None:
-            self._info_value.set("The Game Ends In a Tie!")
+        self._info_value.set("The Game Ends In a Tie!")
