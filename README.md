@@ -35,10 +35,14 @@ cd tic-tac-toe
 
 ## About the project (and me)
 ![multiple games played against the bot](/docs/multiple_games.gif)
+
+
 I was always curious about how chess engines work. So to understand them better I started for something simpler: Tic-Tac-Toe.
 Tic-Tac-Toe is another [Zero-sum game](https://en.wikipedia.org/wiki/Zero-sum_game), like chess.
 This kind of games we can model using a [Game Tree](https://en.wikipedia.org/wiki/Game_tree), which is a graph that represents all possible game states starting from a given state.
+
 ![game tree example for tic-tac-toe](/docs/game_tree.webp)
+
 For Tic-Tac-Toe we can build the full game tree in a reasonable time (in a few seconds), and that is what we do in this project.
 **The only performance improvement we make** is to generate the full tree on startup _(that's why the game takes a couple of second to start)_, but then we use that same tree for every move and game played. That way you can reset the game instantly, but the complexity of the project does not scale above the scope.
 The full tree has 549945 nodes _(internal and leafs)_ and the _root_ node. And takes approximately 350-380MB of ram.
