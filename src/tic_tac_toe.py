@@ -85,7 +85,7 @@ class TicTacToe:
         return self._is_board_complete() and (self._winner == None)
 
     def get_legal_moves(self) -> list[tuple[int, int]]:
-        if self._winner:
+        if self._winner or self.is_tie():
             return []
         legal_moves: list[tuple[int,int]] = []
         for r in range(3):

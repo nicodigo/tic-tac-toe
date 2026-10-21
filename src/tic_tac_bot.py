@@ -17,8 +17,10 @@ class GSNode:
 class TicTacBot:
     def __init__(self, game_state: TicTacToe) -> None:
         self._tree_root: GSNode = GSNode(game_state)
+        self._nodes_count = 0
         self._tree_root = self._build_tree(self._tree_root)
         self._root = self._tree_root
+        print(f"Tree complete with: {self._nodes_count} nodes")
 
     def reset(self):
         self._root = self._tree_root
@@ -88,6 +90,7 @@ class TicTacBot:
         for row, col in legal_moves:
             new_game_state = root.game_state.play(row, col)
             new_node = GSNode(new_game_state, (row, col))
+            self._nodes_count += 1
             root.next_states.append(self._build_tree(new_node, depth + 1))
             root.depth = depth
 
